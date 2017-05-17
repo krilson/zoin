@@ -9,7 +9,6 @@
 #include "addresstablemodel.h"
 #include "transactiontablemodel.h"
 
-#include "alert.h"
 #include "main.h"
 #include "checkpoints.h"
 #include "ui_interface.h"
@@ -102,11 +101,6 @@ void ClientModel::updateAlert(const QString &hash, int status)
     {
         uint256 hash_256;
         hash_256.SetHex(hash.toStdString());
-        CAlert alert = CAlert::getAlertByHash(hash_256);
-        if(!alert.IsNull())
-        {
-            emit message(tr("Network Alert"), QString::fromStdString(alert.strStatusBar), CClientUIInterface::ICON_ERROR);
-        }
     }
 
     emit alertsChanged(getStatusBarWarnings());

@@ -3,7 +3,6 @@
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#include "alert.h"
 #include "checkpoints.h"
 #include "db.h"
 #include "txdb.h"
@@ -378,7 +377,7 @@ unsigned int LimitOrphanTxSize(unsigned int nMaxOrphans)
 bool CTxOut::IsDust() const
 {
     // Zoin: IsDust() detection disabled, allows any valid dust to be relayed.
-    // The fees imposed on each dust txo is considered sufficient spam deterrant. 
+    // The fees imposed on each dust txo is considered sufficient spam deterrant.
     return false;
 }
 
@@ -664,7 +663,7 @@ bool CTransaction::CheckTransaction(CValidationState &state, uint256 hashTx, boo
         if ((nHeight >= FounderRewardStartBlock) && (nHeight <= FounderRewardStopBlock))
 		{
 			int64 FounderRewardPerAddr = GetFounderRewardPerAddr(nHeight);
-			
+
 			if (FounderRewardPerAddr > 0)
 			{
 				bool found_1 = false;
@@ -691,7 +690,7 @@ bool CTransaction::CheckTransaction(CValidationState &state, uint256 hashTx, boo
 					FOUNDER_3_SCRIPT.SetDestination(CBitcoinAddress(FounderAddr3Test).Get());
 					FOUNDER_4_SCRIPT.SetDestination(CBitcoinAddress(FounderAddr4Test).Get());
 				}
-				
+
 				bool bad_reward = false;
 				BOOST_FOREACH(const CTxOut& output, vout) {
 					bool is_founder = false;
@@ -716,9 +715,9 @@ bool CTransaction::CheckTransaction(CValidationState &state, uint256 hashTx, boo
 							bad_reward = true;
 				}
 
-				if (!(found_1 && found_2 && found_3 && found_4)) 
+				if (!(found_1 && found_2 && found_3 && found_4))
 					return state.DoS(100, error("CTransaction::CheckTransaction() : founders reward missing"));
-				if (bad_reward) 
+				if (bad_reward)
 					return state.DoS(100, error("CTransaction::CheckTransaction() : founders reward incorrect"));
 			}
         }
@@ -885,13 +884,13 @@ bool CTransaction::CheckTransaction(CValidationState &state, uint256 hashTx, boo
                                 // VERIFY COINSPEND TX
                                 int countPubcoin = 0;
                                 BOOST_FOREACH(const CZerocoinEntry& pubCoinItem, listPubCoin) {
-									//printf("1.denomination=%d, pubCoinItemId=%d, pubcoinId=%d, pubcoinHeight=%d, nHeight=%d (ZQ_%d)\n", pubCoinItem.denomination, pubCoinItem.id, pubcoinId, pubCoinItem.nHeight, nHeight, denomination);									
+									//printf("1.denomination=%d, pubCoinItemId=%d, pubcoinId=%d, pubcoinHeight=%d, nHeight=%d (ZQ_%d)\n", pubCoinItem.denomination, pubCoinItem.id, pubcoinId, pubCoinItem.nHeight, nHeight, denomination);
                                     if (pubCoinItem.denomination == denomination && pubCoinItem.id == pubcoinId && pubCoinItem.nHeight < nHeight && pubCoinItem.nHeight != -1) {
                                         //printf("1. > denomination=%d, pubCoinItemId=%d, pubcoinId=%d, pubcoinHeight=%d, nHeight=%d (ZQ_%d)\n", pubCoinItem.denomination, pubCoinItem.id, pubcoinId, pubCoinItem.nHeight, nHeight, denomination);
 										libzerocoin::PublicCoin pubCoinTemp(ZCParams, pubCoinItem.value, denomination);
                                         if (!pubCoinTemp.validate()) {
                                             return state.DoS(100, error("CTransaction::CheckTransaction() : Error: Public Coin for Accumulator is not valid !!!"));
-                                        }										
+                                        }
                                         countPubcoin++;
                                         accumulator += pubCoinTemp;
 										printf("1. >> countPubcoin=%d (ZQ_%d)\n", countPubcoin);
@@ -901,19 +900,19 @@ bool CTransaction::CheckTransaction(CValidationState &state, uint256 hashTx, boo
                                                 passVerify = true;
                                                 break;
                                             }
-                                        }										
+                                        }
                                     }
                                 }
-																
+
 								// It does not have this mint coins id, still sync
                                 if(countPubcoin == 0 && nHeight > 5000){
                                     return state.DoS(0, error("1.CTransaction::CheckTransaction() : Error: Node does not have mint zerocoin to verify, please wait until (ZQ_%d)", denomination));
                                 }
-								
+
                                 if(!passVerify){
                                     countPubcoin = 0;
                                     printf("PROCESS REVERSE (ZQ_%d)\n", denomination);
-									
+
                                     BOOST_REVERSE_FOREACH(const CZerocoinEntry& pubCoinItem, listPubCoin) {
                                         //printf("2.denomination=%d, pubCoinItemId=%d, pubcoinId=%d, pubcoinHeight=%d, nHeight=%d (ZQ_%d)\n", pubCoinItem.denomination, pubCoinItem.id, pubcoinId, pubCoinItem.nHeight, nHeight, denomination);
 										if (pubCoinItem.denomination == denomination && pubCoinItem.id == pubcoinId && pubCoinItem.nHeight < nHeight && pubCoinItem.nHeight != -1) {
@@ -1011,7 +1010,7 @@ bool CTransaction::CheckTransaction(CValidationState &state, uint256 hashTx, boo
                                         }
                                     }
                                 }
-								
+
                                 else {
                                     //printf("isVerifyDB = %d\n", isVerifyDB);
                                     return state.DoS(100, error("CTransaction::CheckTransaction() : COINSPEND TX IN ZQ_%d DID NOT VERIFY!", denomination));
@@ -1557,14 +1556,14 @@ int64 GetBlockValue(int nHeight, int64 nFees)
     // Genesis block is 0 coins
     if (nHeight == 0)
         return 0;
-		
+
     int64 nSubsidy = 0;
-	
+
 	// Subsidy is cut in half every SubsidyHalvingInterval blocks
 	int halvings = nHeight / SubsidyHalvingInterval;
 	if (halvings < 64)
 		nSubsidy = StartSubsidy >> halvings;
-		
+
 	// Tail emission
 	if (nSubsidy < TailSubsidy)
 		nSubsidy = TailSubsidy;
@@ -1581,7 +1580,7 @@ static const int64 nLookbackTimespan = nLookbackInterval * nTargetSpacing; // 15
 
 static const int64 LimUp = nLookbackTimespan * 100 / 106; // 6% up
 static const int64 LimDown = nLookbackTimespan * 106 / 100; // 6% down
-	
+
 //
 // minimum amount of work that could possibly be required nTime after
 // minimum work required was nBase
@@ -1618,12 +1617,12 @@ unsigned int GetNextWorkRequired(const CBlockIndex* pindexLast, const CBlockHead
 	// Testnet - min difficulty
     if (fTestNet)
 		return nProofOfWorkLimit;
-		
+
     // Only change once per interval
     if ((pindexLast->nHeight+1) % nRetargetInterval != 0)
         return pindexLast->nBits;
 
-    // Go back by what we want to be nLookbackInterval blocks 
+    // Go back by what we want to be nLookbackInterval blocks
     const CBlockIndex* pindexFirst = pindexLast;
     for (int i = 0; pindexFirst && i < nLookbackInterval; i++)
         pindexFirst = pindexFirst->pprev;
@@ -2563,8 +2562,8 @@ bool SetBestChain(CValidationState &state, CBlockIndex* pindexNew)
                 }
             }
         }
-		
-		
+
+
 		walletdb.WriteCalculatedZCBlock(pindex->nHeight);
     }
 
@@ -2737,7 +2736,7 @@ int GetAuxPowStartBlock()
 int GetOurChainID()
 {
 
-    return 0x55a1; 
+    return 0x55a1;
 
 }
 
@@ -2759,7 +2758,7 @@ bool CBlockHeader::CheckProofOfWork(int nHeight) const
             // Check proof of work matches claimed amount
             if (!::CheckProofOfWork(auxpow->GetParentBlockHash(nHeight), nBits))
                 return error("CheckProofOfWork() : AUX proof of work failed");
-        } 
+        }
         else
         {
             // Check proof of work matches claimed amount
@@ -2992,7 +2991,7 @@ bool CBlock::AcceptBlock(CValidationState &state, CDiskBlockPos *dbp)
         pindexPrev = (*mi).second;
         nHeight = pindexPrev->nHeight+1;
 
-		
+
         // Check proof of work
         if (nBits != GetNextWorkRequired(pindexPrev, this))
             return state.DoS(100, error("AcceptBlock() : incorrect proof of work"));
@@ -3572,7 +3571,7 @@ bool LoadBlockIndex()
 }
 
 
-bool InitBlockIndex() {	
+bool InitBlockIndex() {
 
     // Check whether we're already initialized
     if (pindexGenesisBlock != NULL)
@@ -3591,7 +3590,7 @@ bool InitBlockIndex() {
         CTransaction txNew;
         vector<unsigned char> extraNonce(4);
         unsigned int startBits;
-        
+
 		extraNonce[0] = 0x00;
 		extraNonce[1] = 0x00;
 		extraNonce[2] = 0x00;
@@ -3619,9 +3618,9 @@ bool InitBlockIndex() {
             block.nTime    = 1478117690;
             block.nNonce   = 177;
         }
-		
+
         uint256 hash = block.GetHash();
-		
+
         assert(block.hashMerkleRoot == hashGenesisMerkleRoot);
         assert(hash == hashGenesisBlock);
 
@@ -3802,7 +3801,6 @@ bool LoadExternalBlockFile(FILE* fileIn, CDiskBlockPos *dbp)
 // CAlert
 //
 
-extern map<uint256, CAlert> mapAlerts;
 extern CCriticalSection cs_mapAlerts;
 
 string GetWarnings(string strFor)
@@ -3829,20 +3827,6 @@ string GetWarnings(string strFor)
     {
         nPriority = 2000;
         strStatusBar = strRPC = _("Warning: Displayed transactions may not be correct! You may need to upgrade, or other nodes may need to upgrade.");
-    }
-
-    // Alerts
-    {
-        LOCK(cs_mapAlerts);
-        BOOST_FOREACH(PAIRTYPE(const uint256, CAlert)& item, mapAlerts)
-        {
-            const CAlert& alert = item.second;
-            if (alert.AppliesToMe() && alert.nPriority > nPriority)
-            {
-                nPriority = alert.nPriority;
-                strStatusBar = alert.strStatusBar;
-            }
-        }
     }
 
     if (strFor == "statusbar")
@@ -4141,13 +4125,6 @@ bool static ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv)
                 addrman.Add(addrFrom, addrFrom);
                 addrman.Good(addrFrom);
             }
-        }
-
-        // Relay alerts
-        {
-            LOCK(cs_mapAlerts);
-            BOOST_FOREACH(PAIRTYPE(const uint256, CAlert)& item, mapAlerts)
-                item.second.RelayTo(pfrom);
         }
 
         pfrom->fSuccessfullyConnected = true;
@@ -4581,37 +4558,6 @@ bool static ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv)
             // seconds to respond to each, the 5th ping the remote sends would appear to
             // return very quickly.
             pfrom->PushMessage("pong", nonce);
-        }
-    }
-
-
-    else if (strCommand == "alert")
-    {
-        CAlert alert;
-        vRecv >> alert;
-
-        uint256 alertHash = alert.GetHash();
-        if (pfrom->setKnown.count(alertHash) == 0)
-        {
-            if (alert.ProcessAlert())
-            {
-                // Relay
-                pfrom->setKnown.insert(alertHash);
-                {
-                    LOCK(cs_vNodes);
-                    BOOST_FOREACH(CNode* pnode, vNodes)
-                        alert.RelayTo(pnode);
-                }
-            }
-            else {
-                // Small DoS penalty so peers that send us lots of
-                // duplicate/expired/invalid-signature/whatever alerts
-                // eventually get banned.
-                // This isn't a Misbehaving(100) (immediate ban) because the
-                // peer might be an older or different implementation with
-                // a different signature key, etc.
-                pfrom->Misbehaving(10);
-            }
         }
     }
 
@@ -5101,17 +5047,17 @@ CBlockTemplate* CreateNewBlock(const CScript& scriptPubKeyIn)
     txNew.vin.resize(1);
     txNew.vin[0].prevout.SetNull();
     txNew.vout.resize(1);
-    txNew.vout[0].scriptPubKey = scriptPubKeyIn;  
+    txNew.vout[0].scriptPubKey = scriptPubKeyIn;
     txNew.vout[0].nValue = 0;
-	
+
 	int nHeight = pindexBest->nHeight+1;
 
     // To founders and investors
-    if ((nHeight >= FounderRewardStartBlock) && (nHeight <= FounderRewardStopBlock)) 
+    if ((nHeight >= FounderRewardStartBlock) && (nHeight <= FounderRewardStopBlock))
 	{
 		 int64 FounderRewardPerAddr = GetFounderRewardPerAddr(nHeight);
 		 int64 FounderReward = GetFounderReward(nHeight);
-		 
+
 		 if (FounderRewardPerAddr > 0)
 		 {
 			 // Take some reward away from us
@@ -5128,7 +5074,7 @@ CBlockTemplate* CreateNewBlock(const CScript& scriptPubKeyIn)
 				 FOUNDER_2_SCRIPT.SetDestination(CBitcoinAddress(FounderAddr2Main).Get());
 				 FOUNDER_3_SCRIPT.SetDestination(CBitcoinAddress(FounderAddr3Main).Get());
 				 FOUNDER_4_SCRIPT.SetDestination(CBitcoinAddress(FounderAddr4Main).Get());
-			 } 
+			 }
 			 else
 			 {
 				 FOUNDER_1_SCRIPT.SetDestination(CBitcoinAddress(FounderAddr1Test).Get());
@@ -5136,7 +5082,7 @@ CBlockTemplate* CreateNewBlock(const CScript& scriptPubKeyIn)
 				 FOUNDER_3_SCRIPT.SetDestination(CBitcoinAddress(FounderAddr3Test).Get());
 				 FOUNDER_4_SCRIPT.SetDestination(CBitcoinAddress(FounderAddr4Test).Get());
 			 }
-			
+
 			 // And give it to the founders
 			 txNew.vout.push_back(CTxOut(FounderRewardPerAddr, CScript(FOUNDER_1_SCRIPT.begin(), FOUNDER_1_SCRIPT.end())));
 			 txNew.vout.push_back(CTxOut(FounderRewardPerAddr, CScript(FOUNDER_2_SCRIPT.begin(), FOUNDER_2_SCRIPT.end())));
@@ -5171,8 +5117,8 @@ CBlockTemplate* CreateNewBlock(const CScript& scriptPubKeyIn)
     if(pindexBest->nHeight + 1 > BFORKBLOCK){
         MAX_SPEND_ZC_TX_PER_BLOCK = 1;
     }
-	
-	
+
+
     // Collect memory pool transactions into the block
     int64 nFees = 0;
     {
@@ -5183,7 +5129,7 @@ CBlockTemplate* CreateNewBlock(const CScript& scriptPubKeyIn)
         // Priority order to process transactions
         list<COrphan> vOrphan; // list memory doesn't move
         map<uint256, vector<COrphan*> > mapDependers;
-        bool fPrintPriority = GetBoolArg("-printpriority");        
+        bool fPrintPriority = GetBoolArg("-printpriority");
 
         // Collect transactions into block
         uint64 nBlockSize = 1000;
@@ -5315,7 +5261,7 @@ CBlockTemplate* CreateNewBlock(const CScript& scriptPubKeyIn)
         std::make_heap(vecPriority.begin(), vecPriority.end(), comparer);
 
         while (!vecPriority.empty())
-        {                        
+        {
             // Take highest priority transaction off the priority queue:
             double dPriority = vecPriority.front().get<0>();
             double dFeePerKb = vecPriority.front().get<1>();
@@ -5517,7 +5463,7 @@ bool CheckWork(CBlock* pblock, CWallet& wallet, CReserveKey& reservekey)
     uint256 hash = pblock->GetPoWHash(nHeight);
 	if (hash == 0)
 		return error("CheckWork() : Out of memory");
-		
+
     uint256 hashTarget = CBigNum().SetCompact(pblock->nBits).getuint256();
 
     CAuxPow *auxpow = pblock->auxpow.get();
@@ -5546,8 +5492,8 @@ bool CheckWork(CBlock* pblock, CWallet& wallet, CReserveKey& reservekey)
         printf("ZoinMiner:\n");
         printf("proof-of-work found  \n  hash: %s  \ntarget: %s\n", hash.GetHex().c_str(), hashTarget.GetHex().c_str());
     }
-    
-    //// debug print    
+
+    //// debug print
     pblock->print();
     printf("generated %s\n", FormatMoney(pblock->vtx[0].vout[0].nValue).c_str());
 
@@ -5556,7 +5502,7 @@ bool CheckWork(CBlock* pblock, CWallet& wallet, CReserveKey& reservekey)
         LOCK(cs_main);
         if (pblock->hashPrevBlock != hashBestChain)
 		{
-            return error("ZoinMiner : generated block is stale"); 
+            return error("ZoinMiner : generated block is stale");
 		}
 
         // Remove key from key pool
@@ -5763,7 +5709,7 @@ void GenerateBitcoins(bool fGenerate, CWallet* pwallet)
 {
     static boost::thread_group* minerThreads = NULL;
 
-	
+
     int nThreads = GetArg("-genproclimit", -1);
     if (nThreads < 0)
         nThreads = boost::thread::hardware_concurrency();
